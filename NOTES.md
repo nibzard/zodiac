@@ -93,3 +93,25 @@ cannot cross it. Next: a fundamentally different search — beam over
 KEYS, symbols ordered by frequency, partial decode scored only on
 windows whose five positions are all assigned (each window scored
 exactly once, when its rarest symbol is assigned).
+
+## Experiment 5 — suffix-block key beam (discarded)
+
+Idea: beam over the KEY (not the prefix) for lengths 30 to 199.
+Symbols assigned in frequency order; every contiguous suffix block of
+every window scored once, when its last symbol is assigned; beam
+width 4096 on the first 45 percent of the slice, SA fills the rest.
+
+Run (budget 300): synth_score 4.2000 (tie), z340_gap 0.4745,
+recovered 6/20. Discarded per the keep rule; reverted.
+
+Diagnosis: the true key's beam state dies by step 5 of 31 at width
+4096 (survives to step 4 even at 32768). The truth's early letters
+are deeply uncompetitive while few blocks are scored — junk partials
+flood the beam and width buys only one or two steps per 8x. Same
+myopia wall as the position beam, one level up. Deterministic beams
+are dead for length 100; three search families tried (SA restarts,
+ILS, two beams) all fail the same four instances. Length-100 recovery
+within 9 s stays an open problem.
+
+Search attention now moves to Phase 3 (Z340 transposition replay),
+which the ladder requires before the Phase 5 ensembles.
