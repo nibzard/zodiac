@@ -158,3 +158,25 @@ offline work established:
 Next for phase 3: survivor validation by frequency-fill + full-decode
 LM score, then extension of winning partial keys by annealing with
 the crib frozen.
+
+## Phase 4 — recovery by length (current solver, commit 6688ca3)
+
+9 s slices, four fork workers, budget-300 run plus offline reruns.
+Recovered = top candidate is exactly the true plaintext.
+
+- Length 340: 5/5 recovered. Every crack lands at rank 1 (the truth
+  is the LM optimum once found).
+- Length 100: 1/5 recovered (synth100_1; restart luck, ~1-2 percent
+  per restart chain). The other four: truth absent from all
+  candidates. Best decodes trail the truth by ~0.7 nats per char and
+  differ from the true key in 26-31 of ~30 symbols.
+- Length 32: 0/5. On two of five instances the search finds decodes
+  that OUTSCORE the truth (synth32_2: -46.8 vs -43.4; synth32_4:
+  -51.5 vs -43.7): at 32 characters the truth is not the LM optimum,
+  so score ranking alone cannot put it first even if found.
+- Length 13: 0/5. Unicity distance; only ensemble methods apply.
+
+Collapse point: recovery falls from 5/5 to 1/5 between 340 and 100
+characters (about 10 versus 3 occurrences per symbol), and to 0/5 at
+32. This matches the unicity-distance estimate of roughly 20 to 30
+characters for homophonic substitution.
