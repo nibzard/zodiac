@@ -180,3 +180,27 @@ Collapse point: recovery falls from 5/5 to 1/5 between 340 and 100
 characters (about 10 versus 3 occurrences per symbol), and to 0/5 at
 32. This matches the unicity-distance estimate of roughly 20 to 30
 characters for homophonic substitution.
+
+## Phase 5 — exact near-best ensembles for Z13 and Z32
+
+No solve.py change; solver untouched. Offline tool (in /tmp) runs A*
+over the position tree with a backward-DP admissible bound that
+relaxes repeated-symbol constraints, so enumeration of every decode
+within a margin of the optimum is exact.
+
+- Z13: 2/9/52/1007 distinct readings at margins 1/2/4/8 nats. No
+  dominant reading; best leads tenth by 2.1 nats (0.08 per char).
+- Z32: 1/1/4/468 at the same margins. One dominant reading,
+  3.44 nats clear; within 2 nats it is the only reading. Content is
+  address-like ('SAN FRANC...', 'CALIF', 'PLEASE RUSH TO EDITOR',
+  VALLEJO, SF CHRONICLE variants). Corpus check: 'Rush to Editor'
+  appears 10 times in data/zodiac-letters.txt, so the model reward
+  is domain phrasing, not independent evidence.
+- Report written: ENSEMBLE.md (this commit). Report margin is 4
+  nats; margin 8 given as counts plus top 20. Z13 margin 12 was
+  attempted and abandoned (enumeration did not finish; margin 8 is
+  the report ceiling).
+
+Search attention returns to Phase 3 (z340_gap target under 0.2):
+crib-drag survivor validation by frequency-fill plus full-decode LM
+score, then annealing with winning cribs frozen.
