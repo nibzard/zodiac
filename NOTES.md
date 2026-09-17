@@ -70,3 +70,26 @@ Next: length 100 is the live gap (4 of 5 instances absent). Plan:
 iterated local search — perturb the best pooled key (randomize a
 fraction of symbols) and re-anneal from it at low temperature, so
 late restarts start inside the basin instead of from scratch.
+
+## Experiment 4 — iterated local search (commit 4c118a3, discarded)
+
+Idea: after a first restart, re-anneal from the worker's best key
+with a third of its symbols randomized, at low start temperature.
+
+Run (budget 300): synth_score 5.1000 (worse than 4.2000), z340_gap
+0.4788, recovered 3/20. Discarded, reverted.
+
+Diagnosis: length 340 lost its 5/5 — crack rate there comes from
+restart diversity (each 80k restart ~20% independent chance), and
+ILS chains collapse onto one attractor. Length 100 did not improve
+either: offline, the four failing instances stay absent and the best
+decode still trails the truth by ~0.7 nats/char.
+
+Measurement that explains the length-100 wall: the polished optimum
+of synth100_0 differs from the true key in 29 of 31 symbols while
+scoring only 0.7 nats/char worse. The fluent-junk plateau is wide;
+the truth is an isolated deep point. Local moves and perturbations
+cannot cross it. Next: a fundamentally different search — beam over
+KEYS, symbols ordered by frequency, partial decode scored only on
+windows whose five positions are all assigned (each window scored
+exactly once, when its rarest symbol is assigned).
