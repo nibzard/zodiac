@@ -115,3 +115,46 @@ within 9 s stays an open problem.
 
 Search attention now moves to Phase 3 (Z340 transposition replay),
 which the ladder requires before the Phase 5 ensembles.
+
+## Phase 3 findings — Z340 transposition structure (offline R&D)
+
+No solve.py change yet; solver untouched since experiment 5. What the
+offline work established:
+
+- The Z340 replay window is 120 s (budget 300, synthetic share 0.6).
+  z340_gap = truth logperchar minus the best logperchar over ALL
+  returned candidates. Truth scores -2.0841 per char; the current
+  solver's fluent-junk plateau sits near -2.49 (gap ~0.41).
+- Reading-order family swept with deep 400k restarts: plain rows and
+  near-rows variants dominate shallow sweeps; all clean column orders
+  trail by 2+ nats. Rows-family scores are near-duplicates (row-local
+  context intact), so that signal is not evidence of correctness.
+- Alignment check against the confirmed solution (read-only): the
+  true order class is the 9-9-2 row-band split with a (1,2)-decimation
+  walk inside each 9-row band (row = k mod 9, col = 2k mod 17, torus
+  wrap), tail two rows read straight. Segment 1 (rows 0-8) is EXACT
+  under this order (0 key conflicts); the tail is near-exact (4); the
+  middle band has 51 conflicts from Zodiac's encryption quirks
+  (skipped cells along the readable text, a moved letter; matches the
+  public 2020 solution writeups).
+- Deep SA on the exact-class member still plateaus at gap +0.41: the
+  key basin is narrow even with the right order, because the corpus
+  does NOT contain the Z340 solution text (grep 0; unlike Z408 whose
+  solution is in the corpus). The truth is not LM-favored the way
+  suite truths are.
+- Word-boundary scoring built from the corpus: segmentation DP over
+  dictionary words of length >= 4 separates the truth from fluent
+  junk by ~570 points (junk wins with short words allowed). Usable as
+  a search guide, not yet wired in.
+- Crib dragging with corpus n-grams: pattern-fit filtering is nearly
+  uninformative at 63 symbols (733k survivors for the top 5000 zodiac
+  10-grams; English-background phrases like SHERLOCKHOLMES poison
+  greedy accumulation, 0/49 key agreement). The corpus does contain
+  12-char runs of the solution ("INGTOCATCHME", "EVERYONEELSE..."),
+  so a validator that fills unassigned symbols by frequency and
+  scores the full decode under the LM should separate the true crib;
+  that engineering is pending.
+
+Next for phase 3: survivor validation by frequency-fill + full-decode
+LM score, then extension of winning partial keys by annealing with
+the crib frozen.
