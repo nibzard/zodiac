@@ -204,3 +204,59 @@ within a margin of the optimum is exact.
 Search attention returns to Phase 3 (z340_gap target under 0.2):
 crib-drag survivor validation by frequency-fill plus full-decode LM
 score, then annealing with winning cribs frozen.
+
+## Post-loop R&D — Jev semantic judgments (offline, solver untouched)
+
+The TypeSafe AI model Jev (a non-generating decision model; returns
+typed judgments with probabilities) was tested as a corpus-free
+coherence judge. All runs offline against saved pools and ensembles;
+no change to solve.py, ciphers.py, or any metric. Raw outputs in
+/tmp/jev_*.json; API key never stored in the repository.
+
+Discrimination, five truth/junk pairs (synth32_2, synth32_4,
+synth100_0, synth100_1, z340; four-level coherence Score):
+truth 2.73 to 2.93 (top level in every case), junk 1.31 to 2.39.
+Z340 pair: truth 2.93 versus our decode 1.50, where the frozen
+5-gram gap is only 0.48 — the semantic separation is about three
+times wider and does not depend on the corpus containing the
+solution. Measured noise floor: one identical string (synth100_1,
+truth found at rank 1) scored 2.87 and 2.39 in one request, so
+deltas under ~0.5 are not decisive.
+
+Ensemble re-rank of the exact margin-8 enumerations:
+
+- Z13, 1007 readings, name-ness Noul under the 'My name is —'
+  context: maximum 0.48, median 0.20, best-to-50th margin 0.16.
+  The LM-best reading falls to Jev rank 16. Independent
+  confirmation of the Phase 5 finding: no reading stands out, by
+  letter statistics or by semantic judgment.
+- Z32, 468 readings, reference/instruction Noul: the San
+  Francisco / Chronicle / rush-to-editor family (288 readings)
+  reaches 0.81; the best non-family reading reaches 0.67
+  (HEZODIACSPEAKINGINEWYEARPHOTOELE). The degenerate repetitive
+  reading the LM ranks 4 (EACHVBATVBAT...SANFRA) drops to 0.40.
+  Confound, stated plainly: Jev's training data plausibly includes
+  the public Zodiac literature, so its preference for the family
+  is recognition, not independent evidence.
+
+Negative results, reported as measured:
+
+- synth_score simulation (Jev re-rank of all 64 candidates on all
+  20 suite instances): 4.2000 to 4.2000, no change. All six
+  in-list truths already sit at rank 1; ordering cannot help the
+  14 absent ones. Jev inside solve.py has no metric value in the
+  current regime.
+- Short strings defeat semantic judgment too: top junk decodes of
+  the 13-char synthetics score 0.84 to 0.94 on the meaningfulness
+  Noul. Coherence discrimination grows with length.
+- Z340 pools under Jev: plain order max 2.14, reordered (the
+  9-9-2 decimation) max 2.31, both far under the truth's 2.93.
+  No false positives: the arbiter reports no readable decode, and
+  none exists in those pools. The Z340 blocker is search, not
+  selection.
+
+Where Jev could still pay off: Jev-guided search on the reordered
+Z340 (perturb the top-coherence pool members, re-anneal, re-judge;
+the frozen LM cannot reward the truth because the corpus lacks it,
+but a coherence judge can), and crib-survivor validation where
+n-gram scoring is poisoned by background phrases.
