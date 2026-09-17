@@ -37,3 +37,36 @@ itemgetter keys; that is exact Viterbi-style pruning for the best
 decode. The truth's prefix should lead the beam at 100/32; for 13 it
 gives the honest ensemble Phase 5 needs. Keep SA as filler for leftover
 time and as the long-cipher engine.
+
+## Experiment 3 — parallel restart pool (commit 6688ca3)
+
+Idea: fork-pool of four workers, each running independent SA restart
+chains inside the same time slice; merge their decode pools.
+
+Run (budget 300): synth_score 4.2000, z340_gap 0.4745 (unchanged),
+recovered 6/20. Kept. Per length (9 s slices): 340 → 5/5 rank 1,
+100 → 1/5, 32 and 13 → 0/5. All non-hits are absent from the list
+(synth_score 4.2 = 14 absent x 6 / 20 exactly).
+
+Bug found on the way: the rewritten greedy swap polish reverted with
+apply(s1, key[s1]) AFTER the swap had already written key[s1] — a
+no-op. Every rejected swap stayed applied and the bookkept score
+drifted from the real key, so polished output scored -4.3 nats/char.
+Capturing the letters before the move fixes it; 80k-iteration
+restarts then crack synth340_0 in 2/10 trials, matching the old
+closure code.
+
+Parameters: shallow restarts everywhere (80k/60k/40k/25k by length);
+deep 400k chains only for >=50 symbols and >=400 characters (Z408
+class), where they reach edit distance 6 and shallow ones stall.
+
+Phase 2 preview (Z408 replay, offline, no crib): deep 400k-iteration
+restarts decode the real 408-symbol cipher to edit distance 6/408
+against the confirmed solution in data/ (-1.037 vs -0.850 nats/char).
+80k restarts stall near edit distance 262. Substitution search is
+validated at full Zodiac key sizes.
+
+Next: length 100 is the live gap (4 of 5 instances absent). Plan:
+iterated local search — perturb the best pooled key (randomize a
+fraction of symbols) and re-anneal from it at low temperature, so
+late restarts start inside the basin instead of from scratch.
