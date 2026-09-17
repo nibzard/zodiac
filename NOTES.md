@@ -260,3 +260,27 @@ Z340 (perturb the top-coherence pool members, re-anneal, re-judge;
 the frozen LM cannot reward the truth because the corpus lacks it,
 but a coherence judge can), and crib-survivor validation where
 n-gram scoring is poisoned by background phrases.
+
+Jev-guided search, run (12 rounds, reordered Z340): each round
+annealed 10 percent-perturbed children of the top-3 coherence
+parents at low temperature plus 16 fresh restarts, then judged the
+64-candidate pool. Result, as measured: coherence never left the
+2.06 to 2.31 band (noise floor about 0.5), edit distance to the
+known truth stayed near 265 of 340 (best pool member 229), and the
+per-round rank correlation between coherence and closeness to
+truth swung between -0.73 and +0.44. No ratchet; the loop failed.
+
+Why, measured directly: perturb the majority-vote true key (87
+symbol conflicts from the segment-2 quirks; decode lands at edit
+distance 42) by 2 to 40 percent of symbols, polish lightly, judge.
+Coherence by mean edit distance: 0 -> 2.99, 84 -> 2.72, 92 -> 2.60,
+98 -> 2.67, 176 -> 1.98, 251 -> 1.84. The judge is a cliff, not a
+slope: flat and high within about 100 edits of the truth, flat and
+low beyond about 180. Simulated-annealing pools live at 229 to 278
+edits, inside the flat low region, so coherence selection has no
+gradient to follow there. Correct integration is the inverse: a
+cheap batched screen over all search output that alarms when any
+candidate crosses about 2.6, because that only happens within the
+100-edit neighborhood of a real solution. Whether any search gets
+that close on Z340 remains the open question; the corpus lacks the
+solution text, so the frozen LM gives no help on the way.
