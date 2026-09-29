@@ -1,0 +1,12 @@
+# Context
+
+## Why This Way
+Initial commit of the zodiac workspace's loose files when the
+project moved to github.com/nibzard/zodiac. The autoresearch
+tree arrives separately in the subtree merge that follows, so
+this commit holds only the top-level notes and the demo.
+
+## Gotchas
+- .claude/ is gitignored: it holds local ralph-loop session
+  state, not project content.
+- zodiac-demo/.impeccable/ is tool cache, also gitignored.
