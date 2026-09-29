@@ -1,0 +1,16 @@
+# Context
+
+## Why This Way
+zodiac-autoresearch was a standalone local git repo (13 commits
+on master, no remote). Options were: add it as a gitlink (broken
+submodule), drop its history, or absorb it with git subtree.
+Subtree won: full history is preserved under the prefix and the
+files are plain tracked files, so clones work with no extra
+setup.
+
+## Gotchas
+- The subtree carries its own .gitignore, which keeps
+  results.tsv and run.log untracked by design (append-only run
+  artifacts). Override deliberately if you want them published.
+- Command used: git subtree add --prefix=zodiac-autoresearch
+  <path-to-old-repo> master
