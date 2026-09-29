@@ -1,0 +1,21 @@
+# Context
+
+## Why This Way
+The README leads with a screenshot because the demo is the
+fastest way to understand what the loop does. The capture is a
+real moment: the live server was running, the annealing search
+had just recovered the synthetic 340-letter target exactly, and
+the result card shows its verified (green) state.
+
+## How to reproduce the screenshot
+- python3 zodiac-demo/server.py  (serves on :8408)
+- open http://localhost:8408, wait until the candidates table
+  fills and the result is verified
+- viewport 1512x1150, screenshot the viewport (not full page)
+
+## Gotchas
+- networkidle never fires on this page: the SSE stream stays
+  open. Wait on DOM state instead.
+- The Jev coherence panel shows no judgments unless
+  TYPESAFE_API_KEY is set; the shot reflects that (threshold
+  line only).
