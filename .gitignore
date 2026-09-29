@@ -1,0 +1,9 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+
+# Local agent state
+.claude/
+
+# Skill working data
+.impeccable/
